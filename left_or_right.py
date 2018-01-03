@@ -47,7 +47,7 @@ while(1):
             disp12MaxDiff = 1,
             uniquenessRatio = 0,
             speckleWindowSize = 100,
-            speckleRange = 32
+            speckleRange = 2
         )
         disp = stereo.compute(frame_left, frame_right).astype(np.float32) / 16.0
         #h, w = frame_left.shape[:2]
