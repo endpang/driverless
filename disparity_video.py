@@ -28,11 +28,33 @@ cv2.namedWindow('right_Webcam', cv2.WINDOW_NORMAL)
 cv2.namedWindow('disparity', cv2.WINDOW_NORMAL)
 
 blockSize = 40
+def update(val = 0):
+    stereo.setBlockSize(cv2.getTrackbarPos('window_size', 'disparity'))
+    stereo.setUniquenessRatio(cv2.getTrackbarPos('uniquenessRatio', 'disparity'))
+    stereo.setSpeckleWindowSize(cv2.getTrackbarPos('speckleWindowSize', 'disparity'))
+    stereo.setSpeckleRange(cv2.getTrackbarPos('speckleRange', 'disparity'))
+    stereo.setDisp12MaxDiff(cv2.getTrackbarPos('disp12MaxDiff', 'disparity'))
+
+    print('computing disparity...')
+    disp = stereo.compute(gray_left, gray_right).astype(np.float32) / 16.0
+
+    cv2.imshow('left', gray_left)
+    cv2.imshow('disparity', (disp-min_disp)/num_disp)
+    
 
 while(cv2.waitKey(1) & 0xFF != ord('q')):
     #ret1, left_frame = l_camera.read()
     #ret2, right_frame = r_camera.read()
-
+    window_size = 5
+    min_disp = 16
+    num_disp = 192-min_disp
+    blockSize = window_size
+    uniquenessRatio = 1
+    speckleRange = 3
+    speckleWindowSize = 3
+    disp12MaxDiff = 200
+    P1 = 600
+    P2 = 2400
     ret, frame = cap.read()
     frame = cv2.resize(frame, (1280, 480), interpolation=cv2.CV_8SC1)   
     left_frame = frame[0:480,0:640] 
@@ -42,6 +64,24 @@ while(cv2.waitKey(1) & 0xFF != ord('q')):
     gray_right = cv2.cvtColor(right_frame, cv2.COLOR_BGR2GRAY)
     cv2.imshow('left_Webcam', gray_left)
     cv2.imshow('right_Webcam', gray_right)
+    cv2.namedWindow('disparity')
+    cv2.createTrackbar('speckleRange', 'disparity', speckleRange, 50, update)    
+    cv2.createTrackbar('window_size', 'disparity', window_size, 21, update)
+    cv2.createTrackbar('speckleWindowSize', 'disparity', speckleWindowSize, 200, update)
+    cv2.createTrackbar('uniquenessRatio', 'disparity', uniquenessRatio, 50, update)
+    cv2.createTrackbar('disp12MaxDiff', 'disparity', disp12MaxDiff, 250, update)
+    stereo = cv2.StereoSGBM_create(
+        minDisparity = min_disp,
+        numDisparities = num_disp,
+        blockSize = window_size,
+        uniquenessRatio = uniquenessRatio,
+        speckleRange = speckleRange,
+        speckleWindowSize = speckleWindowSize,
+        disp12MaxDiff = disp12MaxDiff,
+        P1 = P1,
+        P2 = P2
+    )
+    '''
     stereo = cv2.StereoSGBM_create(minDisparity=1,
         numDisparities=16,
         blockSize=15,
@@ -51,9 +91,11 @@ while(cv2.waitKey(1) & 0xFF != ord('q')):
         disp12MaxDiff = 1,
         P1 = 8*3*blockSize**2,
         P2 = 32*3*blockSize**2)
-    disparity = stereo.compute(gray_left, gray_right)
-    disparity = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-    cv2.imshow('disparity', disparity)
+        '''
+    update()
+    #disparity = stereo.compute(gray_left, gray_right)
+    #disparity = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    #cv2.imshow('disparity', disparity)
 # When everything done, release the capture
 camera.release()
 cv2.destroyAllWindows()
