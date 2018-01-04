@@ -16,18 +16,18 @@ def update(val = 0):
     
 
 if __name__ == "__main__":
-    window_size = 5
+    window_size = 3
     min_disp = 16
     num_disp = 192-min_disp
     blockSize = window_size
-    uniquenessRatio = 1
-    speckleRange = 3
-    speckleWindowSize = 3
+    uniquenessRatio = 16
+    speckleRange = 8
+    speckleWindowSize = 197
     disp12MaxDiff = 200
     P1 = 600
     P2 = 2400
-    imgL = cv2.imread('images/stacked2.png')
-    imgR = cv2.imread('images/stacked1.png')
+    imgL = cv2.imread('images/left_9.jpg')
+    imgR = cv2.imread('images/right_9.jpg')
     cv2.namedWindow('disparity')
     cv2.createTrackbar('speckleRange', 'disparity', speckleRange, 50, update)    
     cv2.createTrackbar('window_size', 'disparity', window_size, 21, update)

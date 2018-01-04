@@ -23,7 +23,7 @@ dev.ctrl_transfer(0x21,0x01,0x0800,0x0600,[0x76,0xc3])
 dev.ctrl_transfer(0x21,0x01,0x0a00,0x0600,[4,0x00])   
 
 firstFrame = None
-window_size = 3
+window_size = 2
 min_disp = 0
 num_disp = 112
 while(1):
@@ -44,10 +44,10 @@ while(1):
             blockSize = 15,
             P1 = 8*3*window_size**2,
             P2 = 32*3*window_size**2,
-            disp12MaxDiff = 1,
-            uniquenessRatio = 0,
-            speckleWindowSize = 100,
-            speckleRange = 2
+            disp12MaxDiff = 24,
+            uniquenessRatio = 11,
+            speckleWindowSize = 175,
+            speckleRange = 46
         )
         disp = stereo.compute(frame_left, frame_right).astype(np.float32) / 16.0
         #h, w = frame_left.shape[:2]
@@ -67,8 +67,10 @@ while(1):
         #disp = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
         #print('-----------------')
         #print(disp[1,120:])
-        disp = np.where(disp > 90,disp,0)
-        l1_new,l2_new = np.vsplit(disp[:,120:],2)
+        disp = np.where(disp > 60,disp,0)
+        l1_new,l2_new = np.split(disp[:,120:],2,axis = 1)
+        cv2.imshow('l1_new',l1_new)
+        cv2.imshow('l2_new',l2_new)        
         #l1,l2 = np.vsplit(disp[:,120:], 2)
         #l1_new = np.where(l1 > 90, l1, 0) 
         #l2_new = np.where(l2 > 90, l2, 0)
@@ -77,9 +79,9 @@ while(1):
         if abs(l1_sum - l2_sum) < 100000:
             continue
         if l1_sum > l2_sum :
-            print("左转",l1_sum - l2_sum)
-        else:
             print("右转",l1_sum - l2_sum)
+        else:
+            print("左转",l1_sum - l2_sum)
         #print("l1:",np.sum(l1_new)/1000)
         #print("l2:",np.sum(l2_new)/1000)
         
