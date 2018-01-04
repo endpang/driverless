@@ -67,6 +67,8 @@ while(1):
         #disp = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
         #print('-----------------')
         #print(disp[1,120:])
+        cv2.imshow("h",disp/num_disp)
+
         disp = np.where(disp > 60,disp,0)
         l1_new,l2_new = np.split(disp[:,120:],2,axis = 1)
         cv2.imshow('l1_new',l1_new)
@@ -76,9 +78,11 @@ while(1):
         #l2_new = np.where(l2 > 90, l2, 0)
         l1_sum = np.sum(l1_new)
         l2_sum = np.sum(l2_new)
-        if abs(l1_sum - l2_sum) < 100000:
+        if abs(l1_sum - l2_sum) < 1000000:
+            #continue
+            print('gogogo')
             continue
-        if l1_sum > l2_sum :
+        elif l1_sum > l2_sum :
             print("右转",l1_sum - l2_sum)
         else:
             print("左转",l1_sum - l2_sum)
@@ -89,7 +93,7 @@ while(1):
         #print( np.mean(l1))
         #print("right:")
         #print( np.mean(l2))
-        cv2.imshow("h",disp/num_disp)
+        #cv2.imshow("h",disp/num_disp)
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 cap.release()
